@@ -12,7 +12,8 @@ oc adm policy add-scc-to-user privileged -n db2b -z db2b
 ```
 
 ## Deploy
-Change your zone/region before deploying.
+Change your zone/region before deploying. 
 ```
 oc create -f deploydb2.yaml
 ```
+Use NodePort to connect to your database. Access container: `oc rsh pod/db2-0` Change user: `su - db2inst1`. 
