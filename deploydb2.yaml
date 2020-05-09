@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db2b-c
+  labels:
+    app: db2b-c
+spec:
+  ports:
+  - port: 50000
+  selector:
+    app: db2b
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db2b-n
+spec:
+  selector:
+    app: db2b
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 50000
+    targetPort: 50000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db2b
+spec:
+  selector:
+    matchLabels:
+      app: db2b
+  serviceName: "db2b"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db2b
+        billingType: hourly
+        region: us-south
+        zone: dal13
+    spec:
+      serviceAccount: db2b
+      containers:
+      - name: db2b
+        securityContext:
+          privileged: true
+        image: ibmcom/db2
+        env:
+        - name: LICENSE 
+          value: accept 
+        - name: DB2INSTANCE 
+          value: db2inst1 
+        - name: DB2INST1_PASSWORD 
+          value: db2inst1
+        - name: DBNAME
+          value: B2BITEST
+        ports:
+        - containerPort: 50000
+          name: db2b
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /database
+          name: db2vol
+  volumeClaimTemplates:
+  - metadata:
+      name: db2vol
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      storageClassName: ibmc-block-bronze
+EOF
