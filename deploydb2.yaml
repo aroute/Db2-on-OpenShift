@@ -74,4 +74,3 @@ spec:
         requests:
           storage: 20Gi
       storageClassName: ibmc-block-bronze
-EOF
